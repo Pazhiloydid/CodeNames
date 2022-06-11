@@ -1,10 +1,5 @@
 #include <iostream>
 #include <boost/asio.hpp>
-#include <gtest/gtest.h>
-
-TEST(Simple, simple) {
-  ASSERT_EQ(1 + 1, 2);
-}
 
 int main() {
     std::cout << "Hello, World!" << std::endl;

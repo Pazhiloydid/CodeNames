@@ -41,7 +41,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_definitions(-Wno-delete-non-abstract-non-virtual-dtor)
 endif()
 
+#Threads
+find_package(Threads REQUIRED)
 
+#Boost
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
 set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
@@ -50,17 +53,20 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 set(BOOST_COMPONENTS)
 list(APPEND BOOST_COMPONENTS system program_options)
 hunter_add_package(Boost COMPONENTS ${BOOST_COMPONENTS})
-### Download dependencies ###
-hunter_add_package(GTest)
-### Find dependencies ###
-find_package(GTest CONFIG REQUIRED) # GTest::main
-find_package(Boost CONFIG COMPONENTS ${BOOST_COMPONENTS})
-
+find_package(Boost CONFIG REQUIRED COMPONENTS ${BOOST_COMPONENTS})
 include_directories(${Boost_INCLUDE_DIRS})
 
+# Create executable
 add_executable(${PROJECT_NAME} main.cpp)
-
-target_link_libraries(${PROJECT_NAME} PUBLIC ${Boost_LIBRARIES} ${GTest_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${Boost_LIBRARIES} Threads::Threads)
 
 ### Testing ###
+hunter_add_package(GTest)
+find_package(GTest REQUIRED)
+
+add_executable(tests tests.cpp)
+
+target_link_libraries(tests GTest::GTest GTest::Main)
+
 enable_testing()
+add_test(NAME unit_tests COMMAND tests)
